@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dashboard - HireLens AI</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body {% if dark_mode %}class="dark-mode"{% endif %}>
+
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar">
+
+  <button class="menu-toggle" id="menuToggle">☰</button>
+
+  <div class="navbar-brand">
+    <div class="logo">HireLens AI</div>
+    <span class="brand-tag">Resume Analyzer</span>
+  </div>
+
+  <div class="navbar-links" id="navMenu">
+    <a href="/" class="nav-link">Home</a>
+    <a href="/dashboard" class="nav-link">Dashboard</a>
+    <a href="/profile" class="nav-link">Profile</a>
+    <a href="/" class="nav-link">New Analysis</a>
+  </div>
+
+  <div class="profile-menu">
+
+    <button
+      type="button"
+      class="profile-chip profile-toggle"
+      id="profileToggle"
+    >
+
+      <div class="profile-avatar">
+        {{ session.get('user', 'U')[:1]|upper }}
+      </div>
+
+      <div class="profile-meta">
+        <span class="profile-label">Logged in as</span>
+        <span class="profile-name">
+          {{ session.get('user', 'User') }}
+        </span>
+      </div>
+
+      <span class="profile-caret">▾</span>
+
+    </button>
+
+    <div class="profile-dropdown" id="profileDropdown">
+
+      <a href="/profile" class="dropdown-item">
+        👤 Profile
+      </a>
+
+      <a href="/settings" class="dropdown-item">
+        ⚙️ Settings
+      </a>
+
+      <form action="/logout" method="GET">
+        <button type="submit" class="dropdown-logout">
+          Logout
+        </button>
+      </form>
+
+    </div>
+
+  </div>
+
+</nav>
+
+<!-- ================= HERO ================= -->
+<section class="hero-mini">
+
+  <h1>📊 Your Resume Dashboard</h1>
+
+  <p>
+    Track resume performance and manage your ATS analyses
+  </p>
+
+</section>
+
+<!-- ================= MAIN ================= -->
+<div class="container">
+
+  <!-- ================= STATS ================= -->
+  <section style="margin-bottom:40px;">
+
+    <h2
+      style="
+      font-size:20px;
+      font-weight:700;
+      margin-bottom:20px;
+      "
+    >
+      Quick Stats
+    </h2>
+
+    <div class="stats-grid">
+
+      <!-- TOTAL RESUMES -->
+      <div class="stat-card">
+        <h3>Total Resumes</h3>
+
+        <p>
+          {{ resumes|length }}
+        </p>
+      </div>
+
+      <!-- BEST SCORE -->
+      <div class="stat-card">
+        <h3>Best Score</h3>
+
+        <p>
+          {% if resumes %}
+            {{ resumes | map(attribute='best_score') | max }}%
+          {% else %}
+            0%
+          {% endif %}
+        </p>
+      </div>
+
+      <!-- TOTAL ANALYSES -->
+      <div class="stat-card">
+        <h3>Total Analyses</h3>
+
+        <p>
+          {{ analyses|length }}
+        </p>
+      </div>
+
+      <!-- AVG SCORE -->
+      <div class="stat-card">
+        <h3>Avg Score</h3>
+
+        <p>
+          {% if analyses %}
+            {{
+              (
+                analyses
+                | map(attribute='match_score')
+                | list
+                | sum
+                /
+                analyses|length
+              ) | int
+            }}%
+          {% else %}
+            0%
+          {% endif %}
+        </p>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ================= RESUMES ================= -->
+  <section style="margin-bottom:40px;">
+
+    <h2
+      style="
+      font-size:20px;
+      font-weight:700;
+      margin-bottom:20px;
+      "
+    >
+      📄 Your Resumes
+    </h2>
+
+    {% if resumes %}
+
+      <div style="display:grid; gap:14px;">
+
+        {% for resume in resumes %}
+
+        <div class="resume-item">
+
+          <div
+            style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:20px;
+            "
+          >
+
+            <div>
+
+              <h4 style="margin-bottom:6px;">
+                {{ resume.name }}
+              </h4>
+
+              <p style="color:#64748B;">
+                Best Score:
+                <strong>
+                  {{ resume.best_score }}%
+                </strong>
+              </p>
+
+            </div>
+
+            <div
+              style="
+              display:flex;
+              flex-direction:column;
+              align-items:flex-end;
+              gap:10px;
+              "
+            >
+
+              <div
+                style="
+                font-size:12px;
+                color:#94A3B8;
+                "
+              >
+                Uploaded on
+                {{ resume.created_at.strftime('%b %d, %Y') }}
+              </div>
+
+              <form
+                action="/delete-resume/{{ resume.id }}"
+                method="POST"
+                onsubmit="return confirm('Delete this resume?')"
+              >
+
+                <button
+                  type="submit"
+                  style="
+                  background:#FEE2E2;
+                  color:#B91C1C;
+                  border:none;
+                  padding:8px 14px;
+                  border-radius:8px;
+                  cursor:pointer;
+                  font-weight:600;
+                  "
+                >
+                  Delete
+                </button>
+
+              </form>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        {% endfor %}
+
+      </div>
+
+    {% else %}
+
+      <div class="card">
+
+        <p
+          style="
+          text-align:center;
+          color:#64748B;
+          "
+        >
+          No resumes uploaded yet.
+        </p>
+
+      </div>
+
+    {% endif %}
+
+  </section>
+
+  <!-- ================= ANALYSES ================= -->
+  <section style="margin-bottom:40px;">
+
+    <h2
+      style="
+      font-size:20px;
+      font-weight:700;
+      margin-bottom:20px;
+      "
+    >
+      🔍 Recent Analyses
+    </h2>
+
+    {% if analyses %}
+
+      <div style="display:grid; gap:14px;">
+
+        {% for analysis in analyses|reverse %}
+
+        <div
+          style="
+          padding:18px;
+          background:white;
+          border-radius:14px;
+          border:1px solid #E2E8F0;
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          box-shadow:0 4px 12px rgba(15,23,42,0.06);
+          "
+        >
+
+          <div>
+
+            <h4
+              style="
+              font-size:16px;
+              font-weight:700;
+              margin-bottom:6px;
+              "
+            >
+              Analysis #{{ analysis.id }}
+            </h4>
+
+            <p
+              style="
+              color:#64748B;
+              font-size:13px;
+              "
+            >
+              {{ analysis.created_at.strftime('%b %d, %Y') }}
+            </p>
+
+          </div>
+
+          <div style="text-align:right;">
+
+            <div
+              style="
+              font-size:28px;
+              font-weight:700;
+              color:#0F766E;
+              margin-bottom:6px;
+              "
+            >
+              {{ analysis.match_score }}%
+            </div>
+
+            <div
+              style="
+              display:inline-block;
+              background:#ECFEFF;
+              color:#0F766E;
+              padding:5px 10px;
+              border-radius:8px;
+              font-size:12px;
+              font-weight:600;
+              "
+            >
+              {{ analysis.rating }}
+            </div>
+
+            <div
+              style="
+              margin-top:12px;
+              display:flex;
+              gap:8px;
+              justify-content:flex-end;
+              "
+            >
+
+              <form
+                action="/delete-analysis/{{ analysis.id }}"
+                method="POST"
+                onsubmit="return confirm('Delete this analysis?')"
+              >
+
+                <button
+                  type="submit"
+                  style="
+                  background:#FEE2E2;
+                  color:#B91C1C;
+                  border:none;
+                  padding:7px 12px;
+                  border-radius:8px;
+                  cursor:pointer;
+                  font-weight:600;
+                  "
+                >
+                  Delete
+                </button>
+
+              </form>
+
+              <a
+                href="/download-report/{{ analysis.id }}"
+                style="
+                background:#ECFEFF;
+                color:#0F766E;
+                padding:7px 12px;
+                border-radius:8px;
+                text-decoration:none;
+                font-weight:600;
+                "
+              >
+                Download
+              </a>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        {% endfor %}
+
+      </div>
+
+    {% else %}
+
+      <div class="card">
+
+        <p
+          style="
+          text-align:center;
+          color:#64748B;
+          "
+        >
+          No analyses yet.
+        </p>
+
+      </div>
+
+    {% endif %}
+
+  </section>
+
+</div>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+
+  <div class="footer-bottom">
+
+    <p>
+      © 2026 HireLens AI —
+      Professional ATS Resume Analyzer
+    </p>
+
+  </div>
+
+</footer>
+
+<!-- ================= JS ================= -->
+<script>
+
+document.getElementById("menuToggle").onclick = function () {
+
+  document
+    .getElementById("navMenu")
+    .classList.toggle("nav-open");
+};
+
+const profileToggle =
+  document.getElementById("profileToggle");
+
+const profileMenu =
+  document.querySelector(".profile-menu");
+
+profileToggle.onclick = function(event) {
+
+  event.stopPropagation();
+
+  profileMenu.classList.toggle("is-open");
+};
+
+document.addEventListener("click", function () {
+
+  profileMenu.classList.remove("is-open");
+});
+
+</script>
+
+</body>
+</html>

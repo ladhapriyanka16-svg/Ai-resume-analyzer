@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile - HireLens AI</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body {% if dark_mode %}class="dark-mode"{% endif %}>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <button class="menu-toggle" id="menuToggle">☰</button>
+
+  <div class="navbar-brand">
+    <div class="logo">HireLens AI</div>
+    <span class="brand-tag">Resume Analyzer</span>
+  </div>
+
+  <div class="navbar-links" id="navMenu">
+    <a href="/" class="nav-link">Home</a>
+    <a href="/dashboard" class="nav-link">Dashboard</a>
+    <a href="/settings" class="nav-link">Settings</a>
+  </div>
+
+  <div class="profile-menu">
+    <button type="button" class="profile-chip profile-toggle" id="profileToggle" aria-expanded="false" aria-controls="profileDropdown">
+      <div class="profile-avatar">{{ session.get('user', 'U')[:1]|upper }}</div>
+      <div class="profile-meta">
+        <span class="profile-label">Logged in as</span>
+        <span class="profile-name">{{ session.get('user', 'User') }}</span>
+      </div>
+      <span class="profile-caret">▾</span>
+    </button>
+
+    <div class="profile-dropdown" id="profileDropdown">
+      <a href="/settings" class="dropdown-item" style="color: #0F766E; font-weight: 700; margin-bottom: 8px;">Settings</a>
+      <form action="/logout" method="POST" style="margin: 0;">
+        <button type="submit" class="dropdown-logout">Logout</button>
+      </form>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO MINI -->
+<section class="hero-mini">
+  <h1>👤 Your Profile</h1>
+  <p>Manage your resume optimization journey</p>
+</section>
+
+<!-- MAIN -->
+<div class="container">
+
+  <!-- PROFILE HEADER -->
+  <div style="max-width: 800px; margin: 40px auto;">
+    <div class="card" style="padding: 40px; border-radius: 16px; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08); text-align: center; margin-bottom: 32px;">
+      <div class="profile-avatar-large">{{ session.get('user', 'U')[:1]|upper }}</div>
+      <h2 style="font-size: 28px; font-weight: 700; color: #0F172A; margin: 16px 0 8px 0;">{{ session.get('user', 'User') }}</h2>
+      <p style="font-size: 14px; color: #64748B; margin: 0;">Premium Resume Optimizer</p>
+    </div>
+
+    <!-- STATS GRID -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px;">
+      <div class="stat-card" style="padding: 24px; border-radius: 12px; background: linear-gradient(135deg, rgba(15,118,110,0.1), rgba(20,184,166,0.1)); border: 1px solid rgba(15,118,110,0.2); text-align: center;">
+        <div style="font-size: 32px; font-weight: 700; color: #0F766E; margin-bottom: 8px;">{{ total_resumes }}</div>
+        <div style="font-size: 14px; color: #64748B; font-weight: 600;">Resumes Uploaded</div>
+      </div>
+
+      <div class="stat-card" style="padding: 24px; border-radius: 12px; background: linear-gradient(135deg, rgba(15,118,110,0.1), rgba(20,184,166,0.1)); border: 1px solid rgba(15,118,110,0.2); text-align: center;">
+        <div style="font-size: 32px; font-weight: 700; color: #0F766E; margin-bottom: 8px;">{{ total_analyses }}</div>
+        <div style="font-size: 14px; color: #64748B; font-weight: 600;">Analyses Performed</div>
+      </div>
+
+      <div class="stat-card" style="padding: 24px; border-radius: 12px; background: linear-gradient(135deg, rgba(15,118,110,0.1), rgba(20,184,166,0.1)); border: 1px solid rgba(15,118,110,0.2); text-align: center;">
+        <div style="font-size: 32px; font-weight: 700; color: #0F766E; margin-bottom: 8px;">{{ average_score }}%</div>
+        <div style="font-size: 14px; color: #64748B; font-weight: 600;">Average Score</div>
+      </div>
+
+      <div class="stat-card" style="padding: 24px; border-radius: 12px; background: linear-gradient(135deg, rgba(15,118,110,0.1), rgba(20,184,166,0.1)); border: 1px solid rgba(15,118,110,0.2); text-align: center;">
+        <div style="font-size: 32px; font-weight: 700; color: #0F766E; margin-bottom: 8px;">{{ best_score }}%</div>
+        <div style="font-size: 14px; color: #64748B; font-weight: 600;">Best Score</div>
+      </div>
+    </div>
+
+    <!-- ACHIEVEMENT BADGES -->
+    <div class="card" style="padding: 32px; border-radius: 16px; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08); margin-bottom: 32px;">
+      <h3 style="font-size: 18px; font-weight: 700; color: #0F172A; margin-bottom: 20px;">🏆 Achievements</h3>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;">
+        <div style="padding: 16px; border-radius: 10px; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); text-align: center;">
+          <div style="font-size: 24px; margin-bottom: 8px;">🚀</div>
+          <div style="font-size: 12px; font-weight: 600; color: #0F172A;">Early Adopter</div>
+        </div>
+
+        {% if best_score >= 80 %}
+        <div style="padding: 16px; border-radius: 10px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); text-align: center;">
+          <div style="font-size: 24px; margin-bottom: 8px;">⭐</div>
+          <div style="font-size: 12px; font-weight: 600; color: #0F172A;">Expert Optimizer</div>
+        </div>
+        {% endif %}
+
+        {% if total_analyses >= 5 %}
+        <div style="padding: 16px; border-radius: 10px; background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); text-align: center;">
+          <div style="font-size: 24px; margin-bottom: 8px;">🎯</div>
+          <div style="font-size: 12px; font-weight: 600; color: #0F172A;">Dedicated User</div>
+        </div>
+        {% endif %}
+
+        <div style="padding: 16px; border-radius: 10px; background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.3); text-align: center;">
+          <div style="font-size: 24px; margin-bottom: 8px;">💎</div>
+          <div style="font-size: 12px; font-weight: 600; color: #0F172A;">Premium Member</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <a href="/dashboard" class="btn-primary" style="text-align: center; padding: 14px; text-decoration: none;">← Back to Dashboard</a>
+      <a href="/settings" class="btn-secondary" style="text-align: center; padding: 14px; text-decoration: none;">⚙️ Settings</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-bottom">
+    <p>&copy; 2026 HireLens AI. Optimizing resumes for careers.</p>
+  </div>
+</footer>
+
+<!-- JS -->
+<script>
+// Navbar toggle
+document.getElementById("menuToggle").onclick = function() {
+  document.getElementById("navMenu").classList.toggle("nav-open");
+};
+
+const profileToggle = document.getElementById("profileToggle");
+const profileMenu = document.querySelector(".profile-menu");
+
+profileToggle.onclick = function(event) {
+  event.stopPropagation();
+  profileMenu.classList.toggle("is-open");
+  profileToggle.setAttribute("aria-expanded", profileMenu.classList.contains("is-open"));
+};
+
+document.addEventListener("click", function() {
+  profileMenu.classList.remove("is-open");
+  profileToggle.setAttribute("aria-expanded", "false");
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,285 @@
+<<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HireLens AI - Professional Resume Analysis</title>
+<link rel="stylesheet" href="/static/style.css">
+
+<style>
+html {
+  scroll-behavior: smooth;
+}
+.feature-pill {
+  text-decoration: none;
+  cursor: pointer;
+}
+</style>
+
+</head>
+<body>
+
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar">
+
+  <button class="menu-toggle" id="menuToggle">☰</button>
+
+  <div class="navbar-brand">
+    <div class="logo">HireLens AI</div>
+    <span class="brand-tag">Resume Analyzer</span>
+  </div>
+
+  <div class="navbar-links" id="navMenu">
+    <a href="#features" class="nav-link">Features</a>
+    <a href="#upload" class="nav-link">Analyze</a>
+    <a href="#how-it-works" class="nav-link">How It Works</a>
+    <a href="/dashboard" class="nav-link">Dashboard</a>
+  </div>
+
+  <div class="profile-menu">
+    <button type="button" class="profile-chip profile-toggle" id="profileToggle" aria-expanded="false" aria-controls="profileDropdown">
+      <div class="profile-avatar">{{ session.get('user', 'U')[:1]|upper }}</div>
+      <div class="profile-meta">
+        <span class="profile-label">Logged in as</span>
+        <span class="profile-name">{{ session.get('user', 'User') }}</span>
+      </div>
+      <span class="profile-caret">▾</span>
+    </button>
+
+    <div class="profile-dropdown" id="profileDropdown">
+      <a href="/profile" class="dropdown-item" style="color: #0F766E; font-weight: 700; margin-bottom: 8px;">👤 Profile</a>
+      <a href="/settings" class="dropdown-item" style="color: #0F766E; font-weight: 700; margin-bottom: 8px;">⚙️ Settings</a>
+      <form action="/logout" method="POST">
+        <button type="submit" class="dropdown-logout">Logout</button>
+      </form>
+    </div>
+  </div>
+
+</nav>
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="hero">
+  <h1>Beat ATS Systems. Get Hired Faster.</h1>
+  <p>HireLens AI analyzes your resume against job descriptions using AI-powered ATS technology—just like recruiters do</p>
+  <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+    <a href="#upload" class="btn-primary" style="text-decoration: none;">🚀 Analyze Now</a>
+    <a href="#features" class="btn-secondary" style="text-decoration: none;">Learn More</a>
+  </div>
+</section>
+
+<div class="container">
+
+  <!-- CTA BUTTONS -->
+  <div class="feature-strip">
+    <a href="#features" class="feature-pill">✨ View Features</a>
+    <a href="#upload" class="feature-pill">📤 Analyze Now</a>
+    <a href="#how-it-works" class="feature-pill">📚 How It Works</a>
+  </div>
+
+  <!-- FEATURES SECTION -->
+  <section class="features-section" id="features">
+    <div class="features-title">
+      <h2>Why Choose HireLens AI?</h2>
+      <p>Comprehensive resume analysis powered by artificial intelligence</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🤖</div>
+        <h3>AI ATS Analysis</h3>
+        <p>Advanced AI mimics how recruiters & ATS systems scan resumes to identify matches</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Skill Matching</h3>
+        <p>See exactly which required skills you have and which ones are missing from your resume</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🏷️</div>
+        <h3>Keyword Analysis</h3>
+        <p>Identify missing industry keywords that could improve your ATS compatibility score</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Detailed Metrics</h3>
+        <p>Get comprehensive breakdowns of skills coverage, keywords, and ATS format compatibility</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">💡</div>
+        <h3>Smart Recommendations</h3>
+        <p>Receive actionable suggestions to optimize your resume for better job matching</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📈</div>
+        <h3>Track Progress</h3>
+        <p>Monitor your improvements over time and compare multiple job applications</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= UPLOAD FORM ================= -->
+  <section class="upload-form-card" id="upload">
+    <h2>🚀 Analyze Your Resume</h2>
+
+    <form action="/analyze" method="POST" enctype="multipart/form-data">
+
+      <div class="form-group">
+        <label>Upload Resume (PDF)</label>
+        <input type="file" name="resume" accept=".pdf" required>
+        <small style="color: #64748B; margin-top: 4px; display: block;">Supported format: PDF only</small>
+      </div>
+
+      <div class="form-group">
+        <label>Paste Job Description</label>
+        <textarea name="jd" placeholder="Paste the job description you're applying for..." required></textarea>
+        <small style="color: #64748B; margin-top: 4px; display: block;">Include job title, requirements, responsibilities, and desired skills</small>
+      </div>
+
+      <!-- Job title removed per request -->
+
+      <button type="submit" class="upload-btn">🔍 Analyze Resume</button>
+
+    </form>
+  </section>
+
+  <!-- ================= HOW IT WORKS ================= -->
+  <section id="how-it-works" style="margin-top: 60px;">
+    <div style="text-align: center; margin-bottom: 40px;">
+      <h2 style="font-size: 28px; font-weight: 700; color: #0F172A; margin-bottom: 8px;">How It Works</h2>
+      <p style="font-size: 16px; color: #64748B;">Simple 3-step process to optimize your resume</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px;">
+      <div style="padding: 28px; background: linear-gradient(135deg, rgba(15,118,110,0.05), rgba(20,184,166,0.05)); border-radius: 14px; border: 1px solid rgba(15,118,110,0.1); text-align: center;">
+        <div style="width: 48px; height: 48px; border-radius: 12px; background: #0F766E; color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 16px; font-weight: 700;">1</div>
+        <h3 style="font-size: 18px; font-weight: 700; color: #0F172A; margin-bottom: 8px;">Upload & Paste</h3>
+        <p style="font-size: 14px; color: #64748B;">Upload your resume PDF and paste the job description you're targeting</p>
+      </div>
+
+      <div style="padding: 28px; background: linear-gradient(135deg, rgba(15,118,110,0.05), rgba(20,184,166,0.05)); border-radius: 14px; border: 1px solid rgba(15,118,110,0.1); text-align: center;">
+        <div style="width: 48px; height: 48px; border-radius: 12px; background: #0F766E; color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 16px; font-weight: 700;">2</div>
+        <h3 style="font-size: 18px; font-weight: 700; color: #0F172A; margin-bottom: 8px;">AI Analysis</h3>
+        <p style="font-size: 14px; color: #64748B;">Our AI analyzes your resume against the job description and industry standards</p>
+      </div>
+
+      <div style="padding: 28px; background: linear-gradient(135deg, rgba(15,118,110,0.05), rgba(20,184,166,0.05)); border-radius: 14px; border: 1px solid rgba(15,118,110,0.1); text-align: center;">
+        <div style="width: 48px; height: 48px; border-radius: 12px; background: #0F766E; color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 16px; font-weight: 700;">3</div>
+        <h3 style="font-size: 18px; font-weight: 700; color: #0F172A; margin-bottom: 8px;">Get Results</h3>
+        <p style="font-size: 14px; color: #64748B;">Receive detailed insights, recommendations, and an improvement plan</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= RESULTS ================= -->
+  {% if score %}
+  <section style="margin-top: 60px; padding: 40px; background: linear-gradient(135deg, #0F766E, #14B8A6); border-radius: 16px; color: white; text-align: center;">
+    <h2 style="font-size: 28px; margin-bottom: 16px;">Analysis Results</h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 32px;">
+      <div>
+        <div style="font-size: 40px; font-weight: 700; margin-bottom: 4px;">{{ score }}%</div>
+        <div style="font-size: 14px; opacity: 0.95;">Overall Score</div>
+      </div>
+      <div>
+        <div style="font-size: 40px; font-weight: 700; margin-bottom: 4px;">{{ rating }}</div>
+        <div style="font-size: 14px; opacity: 0.95;">Rating</div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+      <div style="background: rgba(255,255,255,0.15); padding: 16px; border-radius: 10px;">
+        <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">{{ matched|length }}</div>
+        <div style="font-size: 13px; opacity: 0.9;">Skills Matched</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.15); padding: 16px; border-radius: 10px;">
+        <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">{{ missing|length }}</div>
+        <div style="font-size: 13px; opacity: 0.9;">Skills Missing</div>
+      </div>
+      <div style="background: rgba(255,255,255,0.15); padding: 16px; border-radius: 10px;">
+        <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">{{ missing_keywords|length }}</div>
+        <div style="font-size: 13px; opacity: 0.9;">Keywords Missing</div>
+      </div>
+    </div>
+
+    <a href="/download-report/{{ analysis_id }}" class="btn-primary">
+      <span>📥</span> Download Full Report
+    </a>
+    <a href="/" class="btn-secondary">
+      <span>+ New Analysis</span>
+    </a>
+  </section>
+  {% endif %}
+
+</div>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-section">
+      <h4>HireLens AI</h4>
+      <p>Professional resume analysis powered by artificial intelligence to help you land your dream job.</p>
+    </div>
+    <div class="footer-section">
+      <h4>Product</h4>
+      <a href="#features">Features</a>
+      <a href="#upload">Analyzer</a>
+      <a href="#how-it-works">How It Works</a>
+    </div>
+    <div class="footer-section">
+      <h4>Company</h4>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <a href="#privacy">Privacy Policy</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 HireLens AI. All rights reserved. | Helping job seekers succeed.</p>
+  </div>
+</footer>
+
+<!-- ================= JS ================= -->
+<script>
+
+// Hamburger Menu
+document.getElementById("menuToggle").onclick = function() {
+  document.getElementById("navMenu").classList.toggle("nav-open");
+};
+
+const profileToggle = document.getElementById("profileToggle");
+const profileMenu = document.querySelector(".profile-menu");
+
+profileToggle.onclick = function(event) {
+  event.stopPropagation();
+  profileMenu.classList.toggle("is-open");
+  profileToggle.setAttribute("aria-expanded", profileMenu.classList.contains("is-open"));
+};
+
+document.addEventListener("click", function() {
+  profileMenu.classList.remove("is-open");
+  profileToggle.setAttribute("aria-expanded", "false");
+});
+</script>
+
+</body>
+</html>
+
+profileToggle.onclick = function(event) {
+  event.stopPropagation();
+  profileMenu.classList.toggle("is-open");
+  profileToggle.setAttribute("aria-expanded", profileMenu.classList.contains("is-open"));
+};
+
+document.addEventListener("click", function() {
+  profileMenu.classList.remove("is-open");
+  profileToggle.setAttribute("aria-expanded", "false");
+});
+
+</script>
+
+</body>
+</html>

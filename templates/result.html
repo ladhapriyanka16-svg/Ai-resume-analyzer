@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resume Analysis Report - HireLens AI</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body {% if dark_mode %}class="dark-mode"{% endif %}>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+
+  <button class="menu-toggle" id="menuToggle">☰</button>
+
+  <div class="navbar-brand">
+    <div class="logo">HireLens AI</div>
+    <span class="brand-tag">Professional Resume Analyzer</span>
+  </div>
+
+  <div class="navbar-links" id="navMenu">
+    <a href="/" class="nav-link">Home</a>
+    <a href="/dashboard" class="nav-link">Dashboard</a>
+    <a href="/profile" class="nav-link">Profile</a>
+  </div>
+
+  <div class="profile-menu">
+    <button type="button"
+            class="profile-chip profile-toggle"
+            id="profileToggle">
+
+      <div class="profile-avatar">
+        {{ session.get('user', 'U')[:1]|upper }}
+      </div>
+
+      <div class="profile-meta">
+        <span class="profile-label">Logged in as</span>
+        <span class="profile-name">
+          {{ session.get('user', 'User') }}
+        </span>
+      </div>
+
+      <span class="profile-caret">▾</span>
+    </button>
+
+    <div class="profile-dropdown" id="profileDropdown">
+
+      <a href="/profile"
+         class="dropdown-item">
+         👤 Profile
+      </a>
+
+      <a href="/settings"
+         class="dropdown-item">
+         ⚙️ Settings
+      </a>
+
+      <a href="/logout"
+         class="dropdown-item logout-btn">
+         🚪 Logout
+      </a>
+
+    </div>
+  </div>
+
+</nav>
+
+<!-- JS -->
+<script>
+
+document.getElementById("menuToggle").onclick = function () {
+    document.getElementById("navMenu").classList.toggle("nav-open");
+};
+
+const profileToggle = document.getElementById("profileToggle");
+const profileMenu = document.querySelector(".profile-menu");
+
+profileToggle.onclick = function (e) {
+
+    e.stopPropagation();
+
+    profileMenu.classList.toggle("is-open");
+};
+
+document.addEventListener("click", function () {
+
+    profileMenu.classList.remove("is-open");
+
+});
+
+</script>
+
+<!-- MAIN -->
+<div class="container">
+
+<!-- HEADER -->
+<div class="ats-header">
+
+  <div class="ats-header-title">
+    Resume Analysis Report
+  </div>
+
+  <div class="ats-header-meta">
+
+    <div class="ats-meta-item">
+      📊 Analysis ID:
+      <strong>#{{ analysis_id }}</strong>
+    </div>
+
+    <div class="ats-meta-item">
+      📅 Generated:
+      <strong>Today</strong>
+    </div>
+
+    <div class="ats-meta-item">
+      👤 Candidate:
+      <strong>{{ session.get('user', 'User') }}</strong>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- SCORE METRICS -->
+<div class="score-metrics">
+
+  <!-- OVERALL SCORE -->
+  <div class="metric-card">
+
+    <div class="metric-label">
+      Overall ATS Score
+    </div>
+
+    <div class="metric-value"
+         style="color:
+         {% if score >= 80 %}
+            #10b981
+         {% elif score >= 60 %}
+            #f59e0b
+         {% else %}
+            #ef4444
+         {% endif %};">
+
+      {{ score }}%
+
+    </div>
+
+    <div class="metric-subtext">
+
+      {{ rating }}
+
+    </div>
+
+  </div>
+
+  <!-- SKILLS MATCH -->
+  <div class="metric-card">
+
+    <div class="metric-label">
+      Skills Match
+    </div>
+
+    {% set total_skills = matched|length + missing|length %}
+
+    <div class="metric-value">
+
+      {% if total_skills > 0 %}
+        {{ ((matched|length / total_skills) * 100)|int }}%
+      {% else %}
+        0%
+      {% endif %}
+
+    </div>
+
+    <div class="metric-subtext">
+      {{ matched|length }} / {{ total_skills }} skills matched
+    </div>
+
+  </div>
+
+  <!-- KEYWORDS -->
+  <div class="metric-card">
+
+    <div class="metric-label">
+      Keywords Coverage
+    </div>
+
+    <div class="metric-value">
+
+      {% set keyword_score = 100 - (missing_keywords|length * 8) %}
+
+      {% if keyword_score < 0 %}
+        0%
+      {% else %}
+        {{ keyword_score }}%
+      {% endif %}
+
+    </div>
+
+    <div class="metric-subtext">
+      {{ missing_keywords|length }} missing keywords
+    </div>
+
+  </div>
+
+  <!-- ATS FORMAT -->
+  <div class="metric-card">
+
+    <div class="metric-label">
+      ATS Format
+    </div>
+
+    <div class="metric-value">
+
+      {% if score >= 80 %}
+          ✓
+      {% elif score >= 60 %}
+          ⚠
+      {% else %}
+          ✗
+      {% endif %}
+
+    </div>
+
+    <div class="metric-subtext">
+
+      {% if score >= 80 %}
+          {{ score }}% Compatible
+
+      {% elif score >= 60 %}
+          {{ score }}% Moderate
+
+      {% else %}
+          {{ score }}% Low Compatibility
+      {% endif %}
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- MATCHED SKILLS -->
+<div class="analysis-section">
+
+  <div class="section-header">
+
+    <span class="section-icon">✅</span>
+
+    <div>
+      <div class="section-title">
+        Matched Skills
+      </div>
+
+      <div class="section-subtitle">
+        {{ matched|length }} skills found
+      </div>
+    </div>
+
+  </div>
+
+  {% if matched %}
+
+    <div class="skills-container">
+
+      {% for skill in matched %}
+
+        <span class="skill-badge matched">
+          {{ skill }}
+        </span>
+
+      {% endfor %}
+
+    </div>
+
+  {% else %}
+
+    <p>No matched skills found</p>
+
+  {% endif %}
+
+</div>
+
+<!-- MISSING SKILLS -->
+<div class="analysis-section">
+
+  <div class="section-header">
+
+    <span class="section-icon">❌</span>
+
+    <div>
+
+      <div class="section-title">
+        Missing Skills
+      </div>
+
+      <div class="section-subtitle">
+        {{ missing|length }} missing
+      </div>
+
+    </div>
+
+  </div>
+
+  {% if missing %}
+
+    <div class="skills-container">
+
+      {% for skill in missing %}
+
+        <span class="skill-badge missing">
+          {{ skill }}
+        </span>
+
+      {% endfor %}
+
+    </div>
+
+  {% else %}
+
+    <p>No missing skills 🎉</p>
+
+  {% endif %}
+
+</div>
+
+<!-- MISSING KEYWORDS -->
+<div class="analysis-section">
+
+  <div class="section-header">
+
+    <span class="section-icon">🏷️</span>
+
+    <div>
+
+      <div class="section-title">
+        Missing Keywords
+      </div>
+
+      <div class="section-subtitle">
+        ATS keyword optimization
+      </div>
+
+    </div>
+
+  </div>
+
+  {% if missing_keywords %}
+
+    <div class="skills-container">
+
+      {% for word in missing_keywords %}
+
+        <span class="skill-badge keyword">
+          {{ word }}
+        </span>
+
+      {% endfor %}
+
+    </div>
+
+  {% else %}
+
+    <p>No important keywords missing</p>
+
+  {% endif %}
+
+</div>
+
+<!-- SUGGESTIONS -->
+<div class="analysis-section">
+
+  <div class="section-header">
+
+    <span class="section-icon">💡</span>
+
+    <div>
+
+      <div class="section-title">
+        Suggestions
+      </div>
+
+      <div class="section-subtitle">
+        Improve your ATS score
+      </div>
+
+    </div>
+
+  </div>
+
+  {% if suggestions %}
+
+    <ul class="tips-list">
+
+      {% for item in suggestions %}
+
+        <li>
+          {{ item }}
+        </li>
+
+      {% endfor %}
+
+    </ul>
+
+  {% endif %}
+
+</div>
+
+<!-- ATS TIPS -->
+<div class="analysis-section">
+
+  <div class="section-header">
+
+    <span class="section-icon">🚀</span>
+
+    <div>
+
+      <div class="section-title">
+        ATS Tips
+      </div>
+
+      <div class="section-subtitle">
+        Resume best practices
+      </div>
+
+    </div>
+
+  </div>
+
+  {% if ats_tips %}
+
+    <ul class="tips-list">
+
+      {% for tip in ats_tips %}
+
+        <li>
+          {{ tip }}
+        </li>
+
+      {% endfor %}
+
+    </ul>
+
+  {% endif %}
+
+</div>
+
+<!-- BUTTONS -->
+<div class="button-group">
+
+  <a href="/download-report/{{ analysis_id }}"
+     class="btn-primary">
+
+     📥 Download Report
+
+  </a>
+
+  <a href="/"
+     class="btn-secondary">
+
+     + New Analysis
+
+  </a>
+
+</div>
+
+</div>
+
+</body>
+</html>
